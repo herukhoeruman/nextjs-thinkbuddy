@@ -2,7 +2,7 @@
 
 import * as z from "zod";
 import axios from "axios";
-import { MessageSquare } from "lucide-react";
+import { MessageSquare, Music, VideoIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
@@ -21,10 +21,10 @@ import { UserAvatar } from "@/components/avatar";
 import { BotAvatar } from "@/components/bot-avatar";
 import { useProModal } from "@/hooks/use-pro-modal";
 
-const ConversationPage = () => {
+const VideoPage = () => {
   const ProModal = useProModal();
   const router = useRouter();
-  const [messages, setMessages] = useState<ChatCompletionRequestMessage[]>([]);
+  const [video, setVideo] = useState<string>();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -37,18 +37,11 @@ const ConversationPage = () => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      const userMessages: ChatCompletionRequestMessage = {
-        role: "user",
-        content: values.prompt,
-      };
+      setVideo(undefined);
 
-      const newMessages = [...messages, userMessages];
+      const response = await axios.post("/api/video", values);
 
-      const response = await axios.post("/api/conversation", {
-        messages: newMessages,
-      });
-
-      setMessages((current) => [...current, userMessages, response.data]);
+      setVideo(response.data[0]);
 
       form.reset();
     } catch (error: any) {
@@ -58,18 +51,18 @@ const ConversationPage = () => {
       }
       console.log(error);
     } finally {
-      router.refresh(); //refresh new data
+      router.refresh();
     }
   };
 
   return (
     <div>
       <Heading
-        title="Conversation"
-        description="Our most advanced conversation model"
-        icon={MessageSquare}
-        iconColor="text-violet-500"
-        bgColor="bg-violet-500/10"
+        title="Video Generator"
+        description="Turn your ideas into video"
+        icon={VideoIcon}
+        iconColor="text-orange-700"
+        bgColor="bg-orange-700/10"
       />
       <div className="px-4 lg:px-8">
         <div>
@@ -108,29 +101,19 @@ const ConversationPage = () => {
               <Loader />
             </div>
           )}
-          {messages.length === 0 && !isLoading && (
-            <Empty label="No conversation started" />
+          {!video && !isLoading && <Empty label="No music genereated" />}
+          {video && (
+            <video
+              controls
+              className="w-full aspect-video rounded-lg border bg-black mt-8"
+            >
+              <source src={video} />
+            </video>
           )}
-          <div className="flex flex-col-reverse gap-y-4">
-            {messages.map((message) => (
-              <div
-                key={message.content}
-                className={cn(
-                  "p-8 w-full flex items-start gap-x-8 rounded-lg",
-                  message.role === "user"
-                    ? "bg-white border border-black/10"
-                    : "bg-muted"
-                )}
-              >
-                {message.role === "user" ? <UserAvatar /> : <BotAvatar />}
-                <p className="text-sm">{message.content}</p>
-              </div>
-            ))}
-          </div>
         </div>
       </div>
     </div>
   );
 };
 
-export default ConversationPage;
+export default VideoPage;
