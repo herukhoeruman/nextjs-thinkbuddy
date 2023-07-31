@@ -20,6 +20,7 @@ import { cn } from "@/lib/utils";
 import { UserAvatar } from "@/components/avatar";
 import { BotAvatar } from "@/components/bot-avatar";
 import { useProModal } from "@/hooks/use-pro-modal";
+import toast from "react-hot-toast";
 
 const VideoPage = () => {
   const ProModal = useProModal();
@@ -45,11 +46,13 @@ const VideoPage = () => {
 
       form.reset();
     } catch (error: any) {
-      //tdo: open pro model
+      //open pro model
       if (error?.response?.status === 403) {
         ProModal.onOpen();
+      } else {
+        toast.error("Something went wrong");
       }
-      console.log(error);
+      // console.log(error);
     } finally {
       router.refresh();
     }

@@ -86,7 +86,12 @@ export const ProModal = () => {
             ))}
           </DialogDescription>
           <DialogFooter>
-            <Button size="lg" variant="premium" className="w-full">
+            <Button
+              onClick={() => alert("Kaming Sun")}
+              size="lg"
+              variant="premium"
+              className="w-full"
+            >
               Upgrade
               <Zap className="w-4 h-4 ml-2 fill-white" />
             </Button>

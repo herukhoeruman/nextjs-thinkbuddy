@@ -2,12 +2,11 @@
 
 import * as z from "zod";
 import axios from "axios";
-import { MessageSquare, Music } from "lucide-react";
+import { Music } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { ChatCompletionRequestMessage } from "openai";
 
 import Heading from "@/components/heading";
 import { formSchema } from "./constants";
@@ -16,10 +15,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Empty } from "@/components/empty";
 import { Loader } from "@/components/loader";
-import { cn } from "@/lib/utils";
-import { UserAvatar } from "@/components/avatar";
-import { BotAvatar } from "@/components/bot-avatar";
 import { useProModal } from "@/hooks/use-pro-modal";
+import toast from "react-hot-toast";
 
 const MusicPage = () => {
   const ProModal = useProModal();
@@ -45,9 +42,11 @@ const MusicPage = () => {
 
       form.reset();
     } catch (error: any) {
-      //tdo: open pro model
+      //open pro model
       if (error?.response?.status === 403) {
         ProModal.onOpen();
+      } else {
+        toast.error("Something went wrong");
       }
       console.log(error);
     } finally {
